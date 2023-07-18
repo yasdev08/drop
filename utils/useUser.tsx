@@ -1,0 +1,63 @@
+import {cookies} from 'next/headers'
+import {redirect} from 'next/navigation'
+
+export interface User extends Item {
+    emailVisibility: boolean
+    username: string
+    verified: boolean
+    email?: string | null
+    shop?: string 
+}
+
+
+export const useUser =()=>{
+    const nextCookies = cookies()
+    const pb_auth = nextCookies.get('pb_auth')
+    let user = null
+    if(pb_auth){
+        user = JSON.parse(pb_auth.value)
+        return user
+    }
+    else 
+        return null
+}
+
+
+
+
+
+export const useUserProtected = () =>{
+    const nextCookies = cookies()
+    const pb_auth = nextCookies.get('pb_auth')
+
+    let user = null
+    if(!pb_auth)
+        redirect('/sign-in')
+    else
+        user = JSON.parse(pb_auth.value)
+
+
+    return user
+
+}
+
+export const checkLoggedIn = () => {
+    const nextCookies = cookies()
+    const pb_auth = nextCookies.get('pb_auth')
+    if (pb_auth) {
+      redirect('/')
+    }
+}
+
+
+
+export const getUserData = async() =>{
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const user = useUser()
+    const id = user?.model?.id as string | null
+    const userData = (await fetch(
+        `127.0.0.1:8090/api/collections/users/records/${id}`,
+    ).then((res) => res.json())) as User
+    return userData
+}
+
