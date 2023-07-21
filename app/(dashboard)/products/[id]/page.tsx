@@ -5,6 +5,9 @@ import pocketbase from "pocketbase"
 import "../../../globals.css"
 
 async function getProducts(productId: string){
+
+
+  // Api call to pocketbase
   const res = await fetch(
     `http://127.0.0.1:8090/api/collections/products/records/${productId}`,
     {
