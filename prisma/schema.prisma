@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id                    String   @id @default(uuid())
+  email                 String   @unique
+  phone                 String   @unique
+  fullName              String
+  verified              Boolean  @default(false)
+  password              String
+  totalProductsSold     Int      @default(0)
+  totalProductsReturned Int      @default(0)
+  balance               Balance?
+  Orders                Order[]
+  ccpId                 String   @unique
+  ccp                   CCP      @relation(fields: [ccpId], references: [id])
+  storeId               String?  @unique
+  store                 Store?   @relation(fields: [storeId], references: [id])
+  isExpired             Boolean  @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiresAt DateTime?
+
+  @@index([ccpId])
+  @@index([storeId])
+}
+
+model CCP {
+  id        String @id @default(uuid())
+  firstName String
+  lastName  String
+  phoneCCP  String @unique
+  numeroCCP String @unique
+  cleCCP    String
+  address   String
+  User      User?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id             String      @id @default(uuid())
+  reference      Int         @unique @default(autoincrement())
+  name           String
+  description    String
+  quantity       Int
+  sellingPrice   Float
+  wholesalePrice Float
+  discount       Float
+  available      Boolean     @default(true)
+  images         Image[]
+  orderItems     OrderItem[]
+  categoryId     String
+  Category       Category    @relation(fields: [categoryId], references: [id])
+  sizeId         String
+  Size           Size        @relation(fields: [sizeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([sizeId])
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  Products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Size {
+  id       String    @id @default(uuid())
+  name     String
+  Products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Image {
+  id        String  @id @default(uuid())
+  url       String
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model Store {
+  id     String @id @default(uuid())
+  logo   Logo?
+  name   String
+  phone  String
+  wilaya String
+  User   User?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Logo {
+  id      String @id @default(uuid())
+  url     String
+  storeId String @unique
+  store   Store  @relation(fields: [storeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+model Balance {
+  id        String @id @default(uuid())
+  pending   Float  @default(0)
+  available Float  @default(0)
+  paid      Float  @default(0)
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  sellerId   String
+  seller     User        @relation(fields: [sellerId], references: [id])
+  buyerId    String
+  buyer      Buyer       @relation(fields: [buyerId], references: [id])
+  orderItems OrderItem[]
+  totalPrice Float
+  isPaid     Boolean     @default(false)
+  isReturned Boolean     @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerId])
+  @@index([buyerId])
+}
+
+model Buyer {
+  id       String  @id @default(uuid())
+  fullName String
+  phone    String  @unique
+  orders   Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
+}
