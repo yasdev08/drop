@@ -49,6 +49,7 @@ export async function PATCH(
         ...body,
       },
     });
+    return NextResponse.json(user);
   } catch (error: any) {
     return new NextResponse(error, { status: 500 });
   }
