@@ -75,18 +75,18 @@ model Product {
 }
 
 model Category {
-  id      String    @id @default(uuid())
-  name    String
-  Product Product[]
+  id       String    @id @default(uuid())
+  name     String
+  Products Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Size {
-  id      String    @id @default(uuid())
-  name    String
-  Product Product[]
+  id       String    @id @default(uuid())
+  name     String
+  Products Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
