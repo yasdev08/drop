@@ -69,6 +69,7 @@ export async function DELETE(
         id: params.userId,
       },
     });
+    return NextResponse.json(user);
   } catch (error: any) {
     return new NextResponse(error, { status: 500 });
   }
